@@ -14,7 +14,8 @@ GEMINI_KEY = "AIzaSyAio9JpXStGfiLtqRWJfaFOFvq6aHgSjZo"
 
 # إعداد Gemini
 genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel('models/gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-1.5-flash')
+
 
 
 @app.route("/webhook", methods=["GET"])
