@@ -6,17 +6,15 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# --- بياناتك الثابتة ---
+# --- بياناتك ---
 FB_TOKEN = "EAARkORIGoHIBRC4RXZC29byL6kwhyyfiZB4ofvCrjWosD0c59chS9EpIQoSSqtUeEpL2BpZAZAoMXBsoFZBTXFkawQFDRhfTP57vCyVCQbzSTLNE6a2TwLFeSaxMbicpzw0fZByucFvtzITuTDAKTgIs5EeR45tlfRKCMIC6fKva9QYq9WBwISvNBqfZAmvylLzkgZDZD"
 PHONE_NUMBER_ID = "1081197188408116"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
 GEMINI_KEY = "AIzaSyAio9JpXStGfiLtqRWJfaFOFvq6aHgSjZo"
 
-# إعداد Gemini
+# إعداد Gemini - التعديل هنا
 genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
-
-
+model = genai.GenerativeModel('gemini-pro') # تم تغيير الموديل لنسخة أكثر استقراراً
 
 @app.route("/webhook", methods=["GET"])
 def verify():
@@ -27,39 +25,34 @@ def verify():
 @app.route("/webhook", methods=["POST"])
 def receive():
     data = request.get_json()
-    print(f"Received Data: {data}") # سطر لمراقبة الرسائل الواصلة في الـ Logs
+    print(f"Received Data: {data}")
     try:
         if 'messages' in data['entry'][0]['changes'][0]['value']:
             message_obj = data['entry'][0]['changes'][0]['value']['messages'][0]
             user_msg = message_obj['text']['body']
             user_phone = message_obj['from']
 
-            # توليد الرد من Gemini
+            # توليد الرد
             response = model.generate_content(user_msg)
             ai_reply = response.text
 
             # إرسال الرد
             send_whatsapp(user_phone, ai_reply)
     except Exception as e:
-        print(f"Error: {e}") # سطر لمعرفة سبب الفشل إن حدث
+        print(f"Error during processing: {e}")
     return "OK", 200
 
 def send_whatsapp(to, text):
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
-    headers = {
-        "Authorization": f"Bearer {FB_TOKEN}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {FB_TOKEN}", "Content-Type": "application/json"}
     payload = {
         "messaging_product": "whatsapp",
-        "recipient_type": "individual",
         "to": to,
         "type": "text",
         "text": {"body": text}
     }
-    # تعديل مهم: استخدام json=payload لضمان إرسال البيانات بشكل صحيح
-    response = requests.post(url, headers=headers, json=payload)
-    print(f"WhatsApp Response: {response.json()}") # سطر لمراقبة رد فيسبوك
+    r = requests.post(url, headers=headers, json=payload)
+    print(f"WhatsApp Response: {r.json()}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
