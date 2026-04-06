@@ -7,7 +7,7 @@ import google.generativeai as genai
 app = Flask(__name__)
 
 # --- ضع بياناتك هنا ---
-FB_TOKEN = "ضع_هنا_الـ_Access_Token_من_فيسبوك"
+FB_TOKEN = "EAARkORIGoHIBRJDbccUHjN2aaMutBZALLa56O3VSJcQb8Izb6ZAthht4h8TGUTkZCx4JRJE9OckZCVL5vOE9RHIfFbS9NBBziUJHIxe2kRuCYISahc4fbNLmd7AeFmrWEWG6pqM7YcCjv3Fk1cMh5dpnzcvZBp3EofxscwmLcLcFCZBWQmnhJpuJfxLF65DizXB6wx4MT8uxqvQuPFSaXU0TFPTBJNpzwJUAbOtZCMTRCbI7M1W2qhU5wZDZD"
 PHONE_NUMBER_ID = "1081197188408116"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
 GEMINI_KEY = "AIzaSyAio9JpXStGfiLtqRWJfaFOFvq6aHgSjZo"
