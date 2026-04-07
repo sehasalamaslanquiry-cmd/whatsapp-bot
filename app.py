@@ -12,10 +12,11 @@ PHONE_NUMBER_ID = "1081197188408116"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
 GEMINI_KEY = "AIzaSyAio9JpXStGfiLtqRWJfaFOFvq6aHgSjZo"
 
-# إعداد Gemini بطريقة متوافقة تماماً
+# إعداد Gemini القوي والمتوافق
 genai.configure(api_key=GEMINI_KEY)
-# استخدمنا 'gemini-1.5-flash' بدون بادئة 'models/' لأن المكتبة تضيفها تلقائياً في النسخ الجديدة
-model = genai.GenerativeModel('models/gemini-1.5-flash-latest')
+# هذا السطر يجبر المكتبة على استخدام الإصدار المستقر والبحث عن الموديل الصحيح
+model = genai.GenerativeModel(model_name='gemini-1.5-flash')
+
 
 
 @app.route("/webhook", methods=["GET"])
