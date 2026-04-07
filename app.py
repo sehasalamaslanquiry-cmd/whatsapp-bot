@@ -8,7 +8,7 @@ app = Flask(__name__)
 FB_TOKEN = "EAARkORIGoHIBRC4RXZC29byL6kwhyyfiZB4ofvCrjWosD0c59chS9EpIQoSSqtUeEpL2BpZAZAoMXBsoFZBTXFkawQFDRhfTP57vCyVCQbzSTLNE6a2TwLFeSaxMbicpzw0fZByucFvtzITuTDAKTgIs5EeR45tlfRKCMIC6fKva9QYq9WBwISvNBqfZAmvylLzkgZDZD"
 PHONE_NUMBER_ID = "1081197188408116"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
-GROQ_API_KEY = "Gsk_cHw04OZR4NOXCc92iCUnWGdyb3FYjfWVo8CqGSZA0iPiIDiBUWKC"
+GROQ_API_KEY = "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"
 
 def get_ai_response(user_text):
     url = "https://api.groq.com/openai/v1/chat/completions"
