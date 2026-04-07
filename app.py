@@ -12,27 +12,26 @@ VERIFY_TOKEN = "MY_BOT_TOKEN_123"
 GEMINI_KEY = "AIzaSyDwPIIaqScwtnCYkHMYWJW_aVn1LEPp8l0"
 
 def get_gemini_response(user_text):
-    # استخدام المسار الأكثر دقة وتحديثاً
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_KEY}"
+    # استخدام موديل gemini-pro (الإصدار الأول المستقر)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_KEY}"
     headers = {'Content-Type': 'application/json'}
     payload = {
-        "contents": [{
-            "parts": [{"text": user_text}]
-        }]
+        "contents": [{"parts": [{"text": user_text}]}]
     }
     
     try:
         response = requests.post(url, headers=headers, json=payload)
         result = response.json()
-        print(f"Gemini Raw Response: {result}")
         
-        if 'candidates' in result and len(result['candidates']) > 0:
+        # إذا نجح الرد
+        if 'candidates' in result:
             return result['candidates'][0]['content']['parts'][0]['text']
-        else:
-            # إذا فشل الفلاش، سنجرب الموديل المستقر الآخر تلقائياً
-            return "أهلاً بك! أنا أتعلم الآن، كيف يمكنني مساعدتك؟"
-    except Exception as e:
-        return "عذراً، واجهت مشكلة تقنية."
+        
+        # إذا أعطى جوجل خطأ "المنطقة غير مدعومة" أو 404
+        print(f"خطأ جوجل: {result}")
+        return "أهلاً سامي، أنا أسمعك بوضوح ولكن يبدو أن هناك قيداً على مفتاح API الخاص بك حالياً."
+    except:
+        return "عذراً، واجهت مشكلة في الاتصال."
 
 
 @app.route("/webhook", methods=["GET"])
