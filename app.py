@@ -18,10 +18,16 @@ def get_ai_response(user_text):
     }
     payload = {
         "model": "llama-3.3-70b-versatile",  # هذا هو الموديل الحديث والمدعوم حالياً
-        "messages": [
-            {"role": "system", "content": "أنت مساعد ذكي ومفيد."},
+                "messages": [
+            {
+                "role": "system", 
+                "content": "أنت المساعد الآلي الخاص بسامي المجيدي. مهمتك هي الرد على الرسائل بذكاء ولطافة. "
+                           "إذا سألك أحد من أنت، قل: 'أنا المساعد الذكي لسامي، هو غير متاح الآن وسأقوم بمساعدتك بالنيابة عنه'. "
+                           "اجعل ردودك قصيرة ومفيدة."
+            },
             {"role": "user", "content": user_text}
         ]
+
     }
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=10)
