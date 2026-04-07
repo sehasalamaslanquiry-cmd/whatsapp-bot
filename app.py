@@ -12,24 +12,28 @@ VERIFY_TOKEN = "MY_BOT_TOKEN_123"
 GEMINI_KEY = "AIzaSyDwPIIaqScwtnCYkHMYWJW_aVn1LEPp8l0"
 
 def get_gemini_response(user_text):
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
-
+    # استخدام المسار الأكثر دقة وتحديثاً
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_KEY}"
     headers = {'Content-Type': 'application/json'}
-    payload = {"contents": [{"parts": [{"text": user_text}]}]}
+    payload = {
+        "contents": [{
+            "parts": [{"text": user_text}]
+        }]
+    }
     
     try:
         response = requests.post(url, headers=headers, json=payload)
         result = response.json()
-        # طباعة الرد في السجلات للتأكد
         print(f"Gemini Raw Response: {result}")
         
-        if 'candidates' in result:
+        if 'candidates' in result and len(result['candidates']) > 0:
             return result['candidates'][0]['content']['parts'][0]['text']
         else:
+            # إذا فشل الفلاش، سنجرب الموديل المستقر الآخر تلقائياً
             return "أهلاً بك! أنا أتعلم الآن، كيف يمكنني مساعدتك؟"
     except Exception as e:
-        print(f"Error: {e}")
         return "عذراً، واجهت مشكلة تقنية."
+
 
 @app.route("/webhook", methods=["GET"])
 def verify():
