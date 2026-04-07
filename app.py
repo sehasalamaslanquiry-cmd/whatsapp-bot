@@ -17,9 +17,9 @@ def get_ai_response(user_text):
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "llama3-8b-8192",
+        "model": "llama-3.3-70b-versatile",  # هذا هو الموديل الحديث والمدعوم حالياً
         "messages": [
-            {"role": "system", "content": "أنت مساعد ذكي ومختصر."},
+            {"role": "system", "content": "أنت مساعد ذكي ومفيد."},
             {"role": "user", "content": user_text}
         ]
     }
@@ -27,16 +27,14 @@ def get_ai_response(user_text):
         response = requests.post(url, headers=headers, json=payload, timeout=10)
         res_data = response.json()
         
-        # التأكد من نجاح الطلب وجودة الرد
         if response.status_code == 200 and 'choices' in res_data:
             return res_data['choices'][0]['message']['content']
         else:
-            # طباعة الخطأ القادم من Groq في السجلات للتشخيص
             print(f"Groq API Error: {res_data}")
             return "أهلاً سامي! أنا أسمعك، كيف يمكنني مساعدتك اليوم؟"
     except Exception as e:
         print(f"Network Error: {e}")
-        return "عذراً، واجهت مشكلة في الاتصال بالمحرك."
+        return "عذراً، هناك مشكلة في الاتصال."
 
 @app.route("/webhook", methods=["GET"])
 def verify():
