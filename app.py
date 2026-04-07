@@ -9,7 +9,7 @@ app = Flask(__name__)
 FB_TOKEN = "EAARkORIGoHIBRCd4f4AlYR9vHrQinu97fMjyD8ZAayYHjQbQtEwCGev2FHJRHJs21yJyaEAo88ezX2nzoiZBSy8L6iAdETr0OuqaVexx6AhQY4yvpLXCmlOjmkOJu37FhaH1gxIE0DOKzNWrq7nPuc7OQryaAv6KWRB15H9umR03PmCh3QlvjMvyNvQuWwU0QRjFUs5gQqboOlXsxr0ZAJfZAZCyvJ2aLKODFVm1ZADN5QwS7pxs8gzwZDZD"
 PHONE_NUMBER_ID = "1081197188408116"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
-GEMINI_KEY = "AIzaSyAio9JpXStGfiLtqRWJfaFOFvq6aHgSjZo"
+GEMINI_KEY = "AIzaSyDwPIIaqScwtnCYkHMYWJW_aVn1LEPp8l0"
 
 def get_gemini_response(user_text):
     url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
