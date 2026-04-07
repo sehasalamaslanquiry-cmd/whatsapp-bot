@@ -17,20 +17,40 @@ def get_ai_response(user_text):
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "llama3-8b-8192",  # نموذج سريع جداً وذكي
+        "model": "llama3-8b-8192",
         "messages": [
-            {"role": "system", "content": "أنت مساعد ذكي ومرح ترد بلهجة عربية واضحة."},
+            {"role": "system", "content": "أنت مساعد ذكي ومختصر."},
             {"role": "user", "content": user_text}
         ]
     }
     try:
-        response = requests.post(url, headers=headers, json=payload)
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
         res_data = response.json()
-        return res_data['choices'][0]['message']['content']
+        if 'choices' in res_data:
+            return res_data['choices'][0]['message']['content']
+        else:
+            print(f"Groq API Error: {res_data}")
+            return "أهلاً سامي! كيف يمكنني مساعدتك؟"
     except Exception as e:
-        print(f"Groq Error: {e}")
-        return "أهلاً سامي! أنا أسمعك، كيف يمكنني مساعدتك اليوم؟"
+        print(f"Connection Error: {e}")
+        return "أهلاً سامي! كيف يمكنني مساعدتك؟"
 
+@app.route("/webhook", methods=["POST"])
+def receive():
+    data = request.get_json()
+    # الرد فوراً على فيسبوك لمنع تكرار الرسالة
+    if data.get('object'):
+        if 'messages' in data['entry'][0]['changes'][0]['value']:
+            msg_obj = data['entry'][0]['changes'][0]['value']['messages'][0]
+            user_msg = msg_obj['text']['body']
+            user_phone = msg_obj['from']
+            
+            # معالجة الرد وإرساله
+            ai_reply = get_ai_response(user_msg)
+            send_whatsapp(user_phone, ai_reply)
+            
+        return "EVENT_RECEIVED", 200
+    return "NOT_FOUND", 404
 @app.route("/webhook", methods=["GET"])
 def verify():
     if request.args.get("hub.verify_token") == VERIFY_TOKEN:
