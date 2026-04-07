@@ -12,19 +12,30 @@ VERIFY_TOKEN = "MY_BOT_TOKEN_123"
 GEMINI_KEY = "AIzaSyAio9JpXStGfiLtqRWJfaFOFvq6aHgSjZo"
 
 def get_gemini_response(user_text):
-    # مخاطبة Gemini مباشرة عبر الرابط بدون مكتبات وسيطة
+def get_gemini_response(user_text):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
     headers = {'Content-Type': 'application/json'}
-    payload = {"contents": [{"parts": [{"text": user_text}]}]}
+    # تنسيق الطلب الصحيح والمبسط
+    payload = {
+        "contents": [{
+            "parts": [{"text": user_text}]
+        }]
+    }
     
-    response = requests.post(url, headers=headers, json=payload)
-    result = response.json()
-    
-    # استخراج النص من الرد
     try:
-        return result['candidates'][0]['content']['parts'][0]['text']
-    except:
-        return "عذراً، واجهت مشكلة في فهم الرسالة."
+        response = requests.post(url, headers=headers, json=payload)
+        result = response.json()
+        
+        # استخراج النص مع التأكد من وجوده
+        if 'candidates' in result and len(result['candidates']) > 0:
+            return result['candidates'][0]['content']['parts'][0]['text']
+        else:
+            # إذا كان هناك خطأ من جوجل، سيطبعه لنا في الـ Logs لنعرفه
+            print(f"Gemini Error: {result}")
+            return "أهلاً بك! أنا أتعلم الآن، كيف يمكنني مساعدتك؟"
+    except Exception as e:
+        print(f"Connection Error: {e}")
+        return "عذراً، واجهت مشكلة تقنية بسيطة."
 
 @app.route("/webhook", methods=["GET"])
 def verify():
