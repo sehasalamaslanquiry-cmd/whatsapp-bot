@@ -1,38 +1,35 @@
 import os
 import requests
-import json
 from flask import Flask, request
 
 app = Flask(__name__)
 
-# --- بياناتك ---
-FB_TOKEN = "EAARkORIGoHIBRCd4f4AlYR9vHrQinu97fMjyD8ZAayYHjQbQtEwCGev2FHJRHJs21yJyaEAo88ezX2nzoiZBSy8L6iAdETr0OuqaVexx6AhQY4yvpLXCmlOjmkOJu37FhaH1gxIE0DOKzNWrq7nPuc7OQryaAv6KWRB15H9umR03PmCh3QlvjMvyNvQuWwU0QRjFUs5gQqboOlXsxr0ZAJfZAZCyvJ2aLKODFVm1ZADN5QwS7pxs8gzwZDZD"
+# --- بياناتك المحدثة ---
+FB_TOKEN = "EAARkORIGoHIBRC4RXZC29byL6kwhyyfiZB4ofvCrjWosD0c59chS9EpIQoSSqtUeEpL2BpZAZAoMXBsoFZBTXFkawQFDRhfTP57vCyVCQbzSTLNE6a2TwLFeSaxMbicpzw0fZByucFvtzITuTDAKTgIs5EeR45tlfRKCMIC6fKva9QYq9WBwISvNBqfZAmvylLzkgZDZD"
 PHONE_NUMBER_ID = "1081197188408116"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
-GEMINI_KEY = "AIzaSyDwPIIaqScwtnCYkHMYWJW_aVn1LEPp8l0"
+GROQ_API_KEY = "Gsk_cHw04OZR4NOXCc92iCUnWGdyb3FYjfWVo8CqGSZA0iPiIDiBUWKC"
 
-def get_gemini_response(user_text):
-    # استخدام موديل gemini-pro (الإصدار الأول المستقر)
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={GEMINI_KEY}"
-    headers = {'Content-Type': 'application/json'}
-    payload = {
-        "contents": [{"parts": [{"text": user_text}]}]
+def get_ai_response(user_text):
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
     }
-    
+    payload = {
+        "model": "llama3-8b-8192",  # نموذج سريع جداً وذكي
+        "messages": [
+            {"role": "system", "content": "أنت مساعد ذكي ومرح ترد بلهجة عربية واضحة."},
+            {"role": "user", "content": user_text}
+        ]
+    }
     try:
         response = requests.post(url, headers=headers, json=payload)
-        result = response.json()
-        
-        # إذا نجح الرد
-        if 'candidates' in result:
-            return result['candidates'][0]['content']['parts'][0]['text']
-        
-        # إذا أعطى جوجل خطأ "المنطقة غير مدعومة" أو 404
-        print(f"خطأ جوجل: {result}")
-        return "أهلاً سامي، أنا أسمعك بوضوح ولكن يبدو أن هناك قيداً على مفتاح API الخاص بك حالياً."
-    except:
-        return "عذراً، واجهت مشكلة في الاتصال."
-
+        res_data = response.json()
+        return res_data['choices'][0]['message']['content']
+    except Exception as e:
+        print(f"Groq Error: {e}")
+        return "أهلاً سامي! أنا أسمعك، كيف يمكنني مساعدتك اليوم؟"
 
 @app.route("/webhook", methods=["GET"])
 def verify():
@@ -48,10 +45,14 @@ def receive():
             msg_obj = data['entry'][0]['changes'][0]['value']['messages'][0]
             user_msg = msg_obj['text']['body']
             user_phone = msg_obj['from']
-            ai_reply = get_gemini_response(user_msg)
+            
+            # الحصول على الرد من Groq
+            ai_reply = get_ai_response(user_msg)
+            
+            # إرسال الرد لواتساب
             send_whatsapp(user_phone, ai_reply)
-    except Exception as e:
-        print(f"Webhook Error: {e}")
+    except:
+        pass
     return "OK", 200
 
 def send_whatsapp(to, text):
