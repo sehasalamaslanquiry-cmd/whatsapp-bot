@@ -15,7 +15,8 @@ GEMINI_KEY = "AIzaSyAio9JpXStGfiLtqRWJfaFOFvq6aHgSjZo"
 # إعداد Gemini بطريقة متوافقة تماماً
 genai.configure(api_key=GEMINI_KEY)
 # استخدمنا 'gemini-1.5-flash' بدون بادئة 'models/' لأن المكتبة تضيفها تلقائياً في النسخ الجديدة
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('models/gemini-1.5-flash-latest')
+
 
 @app.route("/webhook", methods=["GET"])
 def verify():
