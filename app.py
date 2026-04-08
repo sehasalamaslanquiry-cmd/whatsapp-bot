@@ -67,8 +67,8 @@ def receive():
                 print(f"-------------------------------\n")
 
                 # منع التكرار مع رقم المراقبة
-                if user_phone == "967739704861":
-                    return "OK", 200
+                #if user_phone == "967739704861":
+                  #  return "OK", 200
 
                 ai_reply = get_ai_response(user_msg)
                 
