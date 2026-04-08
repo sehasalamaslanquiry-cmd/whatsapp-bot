@@ -10,37 +10,28 @@ PHONE_NUMBER_ID = "1064201223444303"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
 GROQ_API_KEY = "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"
 
-# --- 1. دالة إرسال نسخة المراقبة لهاتفك الشخصي ---
-def send_monitoring_msg(user_msg, bot_response):
-    admin_number = "967739704861" # رقمك الشخصي الذي ستصلك عليه التقارير
+# --- دالة إرسال نسخة المراقبة (معدلة لتظهر رقم المرسل) ---
+def send_monitoring_msg(sender_phone, user_msg, bot_response):
+    admin_number = "967739704861" 
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {"Authorization": f"Bearer {FB_TOKEN}", "Content-Type": "application/json"}
     payload = {
         "messaging_product": "whatsapp",
         "to": admin_number,
         "type": "text",
-        "text": {"body": f"🔍 مراقبة:\n👤 المستخدم: {user_msg}\n🤖 البوت: {bot_response}"}
+        "text": {"body": f"🔍 مراقبة جديدة:\n📱 رقم المرسل: {sender_phone}\n👤 رسالته: {user_msg}\n🤖 رد البوت: {bot_response}"}
     }
     requests.post(url, headers=headers, json=payload)
 
-# --- دالة الحصول على رد الذكاء الاصطناعي ---
 def get_ai_response(user_text):
     url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {
                 "role": "system", 
-                "content": (
-                    "أنت المساعد الآلي للمهندس سامي المجيدي. "
-                    "إذا سألك أحد 'من أنت؟' أجب: 'أنا صاحب المهندس سامي الروح بالروح، مهلوش الآن لكن سأقوم بمساعدتك بالنيابة عنه'. "
-                    "إذا طلبوا رقم سامي، أخبرهم: 'يمكنك التواصل معه على 739704861'. "
-                    "إذا قيل لك 'أهلاً'، أجب بلهجة ترحيبية يمنية: 'ارحب يا غالي، أي خدمات؟'."
-                )
+                "content": "أنت المساعد الآلي للمهندس سامي المجيدي. رد بلهجة ترحيبية يمنية مختصرة وذكية."
             },
             {"role": "user", "content": user_text}
         ]
@@ -48,9 +39,9 @@ def get_ai_response(user_text):
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=10)
         res_data = response.json()
-        return res_data['choices'][0]['message']['content'] if response.status_code == 200 else "أهلاً! كيف يمكنني مساعدتك؟"
+        return res_data['choices'][0]['message']['content'] if response.status_code == 200 else "أهلاً!"
     except:
-        return "عذراً، هناك مشكلة في الاتصال."
+        return "عذراً، هناك مشكلة."
 
 @app.route("/webhook", methods=["GET"])
 def verify():
@@ -62,25 +53,27 @@ def verify():
 def receive():
     data = request.get_json()
     try:
-        if 'messages' in data['entry'][0]['changes'][0]['value']:
-            msg_obj = data['entry'][0]['changes'][0]['value']['messages'][0]
-            if 'text' in msg_obj:
+        # التأكد من وجود رسالة نصية حقيقية وتجاهل الإشعارات الأخرى
+        entry = data['entry'][0]['changes'][0]['value']
+        if 'messages' in entry:
+            msg_obj = entry['messages'][0]
+            if msg_obj.get('type') == 'text': # فحص أنها رسالة نصية فقط
                 user_msg = msg_obj['text']['body']
                 user_phone = msg_obj['from']
                 
-                # منع التكرار: إذا كانت الرسالة قادمة من رقم المراقبة الخاص بك لا يرد البوت
+                # منع التكرار مع رقم المراقبة
                 if user_phone == "967739704861":
                     return "OK", 200
 
                 ai_reply = get_ai_response(user_msg)
                 
-                # 2. إرسال الرد للمستخدم الأصلي
+                # إرسال الرد للمستخدم
                 send_whatsapp(user_phone, ai_reply)
                 
-                # 3. إرسال نسخة لك للمراقبة (تمت الإضافة هنا)
-                send_monitoring_msg(user_msg, ai_reply)
-    except Exception as e:
-        print(f"Webhook Error: {e}")
+                # إرسال تقرير المراقبة لك مع رقم الشخص
+                send_monitoring_msg(user_phone, user_msg, ai_reply)
+    except:
+        pass
         
     return "OK", 200
 
@@ -88,10 +81,7 @@ def send_whatsapp(to, text):
     url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
     headers = {"Authorization": f"Bearer {FB_TOKEN}", "Content-Type": "application/json"}
     payload = {
-        "messaging_product": "whatsapp",
-        "to": to,
-        "type": "text",
-        "text": {"body": text}
+        "messaging_product": "whatsapp", "to": to, "type": "text", "text": {"body": text}
     }
     requests.post(url, headers=headers, json=payload)
 
