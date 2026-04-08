@@ -60,7 +60,10 @@ def receive():
             if msg_obj.get('type') == 'text': # فحص أنها رسالة نصية فقط
                 user_msg = msg_obj['text']['body']
                 user_phone = msg_obj['from']
-                
+                       print(f"\n--- 📥 رسالة جديدة استلمتها ---")
+        print(f"👤 من رقم: {user_phone}")
+        print(f"💬 محتوى الرسالة: {user_msg}")
+        print(f"-------------------------------\n")
                 # منع التكرار مع رقم المراقبة
                 if user_phone == "967739704861":
                     return "OK", 200
