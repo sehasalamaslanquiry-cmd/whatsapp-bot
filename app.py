@@ -60,8 +60,8 @@ def receive():
 
                 print(f"--- 📥 رسالة من: {user_phone} ---")
 
-                if user_phone == "967739704861":
-                    return "OK", 200
+              #  if user_phone == "967739704861":
+                  #  return "OK", 200
 
                 ai_reply = get_ai_response(user_msg)
                 send_whatsapp(user_phone, ai_reply)
