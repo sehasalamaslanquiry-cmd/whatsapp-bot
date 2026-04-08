@@ -10,20 +10,28 @@ PHONE_NUMBER_ID = "1064201223444303"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
 GROQ_API_KEY = "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"
 
+# --- دالة إرسال نسخة المعاينة لك ---
+def send_monitoring_msg(sender_phone, user_msg, bot_response):
+    admin_number = "967739704861" 
+    url = f"https://graph.facebook.com/v18.0/{PHONE_NUMBER_ID}/messages"
+    headers = {"Authorization": f"Bearer {FB_TOKEN}", "Content-Type": "application/json"}
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": admin_number,
+        "type": "text",
+        "text": {"body": f"🔍 معاينة جديدة:\n📱 من: {sender_phone}\n👤 رسالته: {user_msg}\n🤖 رد البوت: {bot_response}"}
+    }
+    requests.post(url, headers=headers, json=payload)
+
 def get_ai_response(user_text):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     
     system_instructions = """
-    أنت مساعد المهندس سامي المجيدي. جاوب باللهجة التعزية بذكاء.
-    - قواعد الأسعار:
-      1. (موقع) = 100 ريال سعودي.
-      2. (صحتي) = 200 ريال سعودي.
-      3. (رسمي) = 250 ريال سعودي.
-    - إذا وافق الزبون على السعر أو سأل (كيف أسجل؟)، قله:
-      'أبشر يا غالي، من عيوني.. ادخل عبي بياناتك كاملة في هذا الرابط واعتمد الطلب وبنتواصل معك فوراً: https://forms.gle/FLrN9efqCgzvoC476'
-    - إذا سأل عن (السعر بشكل عام)، قله: 'معنا أنواع (موقع، صحتي، رسمي)، أي واحد تشتي أعطيك سعره؟'.
-    - لا تكرر الكلام، كن مختصراً جداً، وتأكد أن الحروف كاملة.
+    أنت مساعد المهندس سامي المجيدي. جاوب باللهجة التعزية بذكاء واختصار.
+    - الأسعار: (موقع=100، صحتي=200، رسمي=250) ريال سعودي.
+    - إذا وافق أو سأل عن التسجيل أرسل الرابط: https://forms.gle/FLrN9efqCgzvoC476
+    - تأكد من كتابة الحروف كاملة.
     """
 
     payload = {
@@ -35,11 +43,10 @@ def get_ai_response(user_text):
         "temperature": 0.4
     }
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
-        res_data = response.json()
-        return res_data['choices'][0]['message']['content']
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        return response.json()['choices'][0]['message']['content']
     except:
-        return "أبشر يا غالي، بس حصل تشويش بسيط، أعد إرسال سؤالك."
+        return "أبشر يا غالي، أعد المحاولة."
 
 @app.route("/webhook", methods=["GET"])
 def verify():
@@ -58,13 +65,17 @@ def receive():
                 user_msg = msg_obj['text']['body']
                 user_phone = msg_obj['from']
 
-                print(f"--- 📥 رسالة من: {user_phone} ---")
-
+                # منع التكرار مع رقمك في المعاينة
                 if user_phone == "967739704861":
                     return "OK", 200
 
                 ai_reply = get_ai_response(user_msg)
+                
+                # إرسال الرد للزبون
                 send_whatsapp(user_phone, ai_reply)
+                
+                # إرسال المعاينة لك (هذا هو السطر الذي كان ناقصاً)
+                send_monitoring_msg(user_phone, user_msg, ai_reply)
     except:
         pass
     return "OK", 200
