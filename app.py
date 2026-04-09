@@ -1,3 +1,5 @@
+
+
 import os
 import requests
 from flask import Flask, request
@@ -88,3 +90,10 @@ def send_whatsapp(to, text):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
+
+
+
+
+
+
