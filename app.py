@@ -66,7 +66,7 @@ def receive():
                 user_phone = msg_obj['from']
 
                 # منع التكرار مع رقمك في المعاينة
-              #  if user_phone == "967739704861":
+                if user_phone == "967739704861":
                     return "OK", 200
 
                 ai_reply = get_ai_response(user_msg)
