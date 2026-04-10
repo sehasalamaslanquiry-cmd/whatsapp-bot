@@ -31,7 +31,7 @@ def get_ai_response(user_text):
     أنت مساعد المهندس سامي المجيدي. جاوب باللهجة التعزية بذكاء واختصار.
     - الأسعار: (موقع=100، صحتي=200، رسمي=250) ريال سعودي.
     - إذا وافق أو سأل عن التسجيل أرسل الرابط: https://forms.gle/FLrN9efqCgzvoC476
-    - تأكد من كتابة الحروف كاملة.
+    - تأكد من كتابة الحروف كاملة وبوضوح.
     """
 
     payload = {
@@ -74,7 +74,7 @@ def receive():
                 # إرسال الرد للزبون
                 send_whatsapp(user_phone, ai_reply)
                 
-                # إرسال المعاينة لك (هذا هو السطر الذي كان ناقصاً)
+                # إرسال المعاينة لك
                 send_monitoring_msg(user_phone, user_msg, ai_reply)
     except:
         pass
@@ -88,10 +88,3 @@ def send_whatsapp(to, text):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
-
-
-
-
-
-
-
