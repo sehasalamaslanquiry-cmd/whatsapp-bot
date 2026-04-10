@@ -8,7 +8,7 @@ app = Flask(__name__)
 FB_TOKEN = "EAARkORIGoHIBROYnLBJOX0lRuEhSniOIdANZAv9ZCRWeNpnzti4Lu7RAyoimTCOZBvfW9SRNo6c6AlJvmrEI8b4uAyM5GF3eZCqjab2vz65d163FzV20hWrXICPh22SEVOGp0pZCpvpcPXLhb0RCm7kZAPZA4qtEwPT2wLSiPiKriLU0sKWe5XkyK9ZBs2YRah7nUQZDZD"
 PHONE_NUMBER_ID = "1064201223444303"
 VERIFY_TOKEN = "MY_BOT_TOKEN_123"
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "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"
 
 # --- دالة إرسال نسخة المعاينة لك ---
 def send_monitoring_msg(sender_phone, user_msg, bot_response):
